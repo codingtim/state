@@ -58,6 +58,18 @@ class EpisodeImageServiceImplTest {
     }
 
     @Test
+    void imageAddFailed() {
+        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url");
+        episodeImage.startProcessing();
+        repository.save(episodeImage);
+
+        service.imageAddFailed(episodeImage.getId());
+        assertFalse(remoteImagesGateway.hasBeenExposed(episodeImage));
+        assertSame(State.PROCESSING_FAILED, episodeImage.getState());
+        assertTrue(hasFlowStates(episodeImage, FlowState.PROCESS_IMAGE_FAILED));
+    }
+
+    @Test
     void imageExposed() {
         EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url");
         episodeImage.startProcessing();
@@ -68,6 +80,19 @@ class EpisodeImageServiceImplTest {
         assertSame(State.PROCESSED, episodeImage.getState());
         assertTrue(hasFlowStates(episodeImage, FlowState.EXPOSE_IMAGE_FINISHED, FlowState.PROCESS_EO_STARTED, FlowState.PROCESS_EO_FINISHED));
         assertTrue(remoteCatalogGateway.editorialObjectWasCreatedFor(episodeImage));
+    }
+
+    @Test
+    void imageExposureFailed() {
+        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url");
+        episodeImage.startProcessing();
+        episodeImage.imageAdded("remoteImage1");
+        repository.save(episodeImage);
+
+        service.imageExposedFailed(episodeImage.getId());
+        assertSame(State.PROCESSING_FAILED, episodeImage.getState());
+        assertTrue(hasFlowStates(episodeImage, FlowState.EXPOSE_IMAGE_FAILED));
+        assertFalse(remoteCatalogGateway.editorialObjectWasCreatedFor(episodeImage));
     }
 
     @Test

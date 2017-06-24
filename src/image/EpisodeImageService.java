@@ -10,5 +10,9 @@ public interface EpisodeImageService {
 
     void imageAdded(String id, String remoteImageId);
 
+    void imageAddFailed(String id);
+
     void imageExposed(String id);
+
+    void imageExposedFailed(String id);
 }

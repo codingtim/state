@@ -58,6 +58,14 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
     }
 
     @Override
+    public void imageAddFailed(String id) {
+        repository.get(id).ifPresent(episodeImageEntity -> {
+            episodeImageEntity.imageAddFailed();
+            repository.save(episodeImageEntity);
+        });
+    }
+
+    @Override
     public void imageExposed(String id) {
         repository.get(id).ifPresent(episodeImageEntity -> {
             episodeImageEntity.imageExposed();
@@ -71,6 +79,14 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
                 }
                 repository.save(episodeImageEntity);
             });
+        });
+    }
+
+    @Override
+    public void imageExposedFailed(String id) {
+        repository.get(id).ifPresent(episodeImageEntity -> {
+            episodeImageEntity.imageExposureFailed();
+            repository.save(episodeImageEntity);
         });
     }
 }

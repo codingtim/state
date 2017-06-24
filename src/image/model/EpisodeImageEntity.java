@@ -117,4 +117,14 @@ public class EpisodeImageEntity {
         addFlowState(FlowState.PROCESS_EO_FAILED);
         state = State.PROCESSING_FAILED;
     }
+
+    public void imageAddFailed() {
+        addFlowState(FlowState.PROCESS_IMAGE_FAILED);
+        state = State.PROCESSING_FAILED;
+    }
+
+    public void imageExposureFailed() {
+        addFlowState(FlowState.EXPOSE_IMAGE_FAILED);
+        state = State.PROCESSING_FAILED;
+    }
 }
