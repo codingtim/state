@@ -8,6 +8,6 @@ public interface EpisodeImageService {
 
     void createImages(List<ScrapedEpisodeEntity> scrapedEpgEpisodes);
 
-    void imageAdded(String id);
+    void imageAdded(String id, String remoteImageId);
 
 }

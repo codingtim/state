@@ -45,9 +45,9 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
     }
 
     @Override
-    public void imageAdded(String id) {
+    public void imageAdded(String id, String remoteImageId) {
         repository.get(id).ifPresent(episodeImageEntity -> {
-            episodeImageEntity.imageAdded();
+            episodeImageEntity.imageAdded(remoteImageId);
             repository.save(episodeImageEntity);
             remoteImagesGateway.expose(episodeImageEntity);
             episodeImageEntity.startExposing();

@@ -91,7 +91,8 @@ public class EpisodeImageEntity {
         addFlowState(FlowState.PROCESS_IMAGE_SCHEDULED);
     }
 
-    public void imageAdded() {
+    public void imageAdded(String remoteImageId) {
+        imageServiceId = remoteImageId;
         addFlowState(FlowState.PROCESS_IMAGE_FINISHED);
     }
 

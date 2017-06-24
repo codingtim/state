@@ -48,10 +48,11 @@ class EpisodeImageServiceImplTest {
         episodeImage.startProcessing();
         repository.save(episodeImage);
 
-        service.imageAdded(episodeImage.getId());
+        service.imageAdded(episodeImage.getId(), "remoteImage1");
         assertTrue(remoteImagesGateway.hasBeenExposed(episodeImage));
         assertSame(State.PROCESSING, episodeImage.getState());
         assertTrue(hasFlowStates(episodeImage, FlowState.PROCESS_IMAGE_FINISHED, FlowState.EXPOSE_IMAGE_SCHEDULED));
+        assertSame("remoteImage1", episodeImage.getImageServiceId());
     }
 
     private boolean hasFlowStates(EpisodeImageEntity episodeImage, FlowState... expected) {
