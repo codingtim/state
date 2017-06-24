@@ -2,12 +2,15 @@ package image;
 
 import episode.EpisodeEntity;
 import image.model.EpisodeImageEntity;
+import image.model.FlowState;
+import image.model.ProcessFlowStateEntity;
 import image.model.State;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import scrape.ScrapedEpisodeEntity;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,23 +35,34 @@ class EpisodeImageServiceImplTest {
 
         service.createImages(Collections.singletonList(scrapedEpisodeEntity));
         Optional<EpisodeImageEntity> result = repository.findByEpisodeIdAndImageUrl("eps1", "http://some.image.com");
-        assertSame(true, result.isPresent());
+        assertTrue(result.isPresent());
         EpisodeImageEntity episodeImageEntity = result.get();
-        assertSame(true, remoteImagesGateway.hasBeenRequested(episodeImageEntity));
+        assertTrue(remoteImagesGateway.hasBeenRequested(episodeImageEntity));
         assertSame(State.PROCESSING, episodeImageEntity.getState());
-        //TODO hamcrest~ matcher that flowState is contained?
+        assertTrue(hasFlowStates(episodeImageEntity, FlowState.PROCESS_IMAGE_SCHEDULED));
     }
 
     @Test
     void imageAdded() {
-        EpisodeImageEntity image = new EpisodeImageEntity("eps1", "some.url");
-        image.startProcessing();
-        repository.save(image);
+        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url");
+        episodeImage.startProcessing();
+        repository.save(episodeImage);
 
-        service.imageAdded(image.getId());
-        assertSame(true, remoteImagesGateway.hasBeenExposed(image));
-        assertSame(State.PROCESSING, image.getState());
-        //TODO hamcrest~ matcher that flowState is contained?
+        service.imageAdded(episodeImage.getId());
+        assertTrue(remoteImagesGateway.hasBeenExposed(episodeImage));
+        assertSame(State.PROCESSING, episodeImage.getState());
+        assertTrue(hasFlowStates(episodeImage, FlowState.PROCESS_IMAGE_FINISHED, FlowState.EXPOSE_IMAGE_SCHEDULED));
+    }
+
+    private boolean hasFlowStates(EpisodeImageEntity episodeImage, FlowState... expected) {
+        return Stream.of(expected)
+                .allMatch(flowState -> hasFlowState(episodeImage, flowState));
+    }
+
+    private boolean hasFlowState(EpisodeImageEntity episodeImageEntity, FlowState expected) {
+        return episodeImageEntity.getFlowStates().stream()
+                .map(ProcessFlowStateEntity::getFlowState)
+                .anyMatch(flowState -> flowState == expected);
     }
 
 }
