@@ -2,8 +2,14 @@ package episode;
 
 public class EpisodeEntity {
 
+    private String id;
     private String whatsonId;
     private String catalogEpisodeId;
+
+    public EpisodeEntity(String id, String whatsonId) {
+        this.id = id;
+        this.whatsonId = whatsonId;
+    }
 
     public String getWhatsonId() {
         return whatsonId;
@@ -21,4 +27,7 @@ public class EpisodeEntity {
         this.catalogEpisodeId = catalogEpisodeId;
     }
 
+    public String getId() {
+        return id;
+    }
 }

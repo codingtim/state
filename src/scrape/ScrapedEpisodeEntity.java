@@ -8,6 +8,11 @@ public class ScrapedEpisodeEntity {
     private String whatsonId;
     private List<String> imageUrls = new LinkedList<>();
 
+    public ScrapedEpisodeEntity(String whatsonId, List<String> imageUrls) {
+        this.whatsonId = whatsonId;
+        this.imageUrls = imageUrls;
+    }
+
     public String getWhatsonId() {
         return whatsonId;
     }

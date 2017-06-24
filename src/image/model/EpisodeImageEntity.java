@@ -16,6 +16,11 @@ public class EpisodeImageEntity {
     private State state = State.NEW;
     private List<ProcessFlowStateEntity> flowStates = new LinkedList<>();
 
+    public EpisodeImageEntity(String episodeId, String epgImageUrl) {
+        this.episodeId = episodeId;
+        this.epgImageUrl = epgImageUrl;
+    }
+
     public String getImageServiceId() {
         return imageServiceId;
     }
