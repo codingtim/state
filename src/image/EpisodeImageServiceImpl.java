@@ -43,4 +43,15 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
     private boolean imageDoesNotExistsForEpisode(EpisodeEntity episodeEntity, String imageUrl) {
         return !repository.findByEpisodeIdAndImageUrl(episodeEntity.getId(), imageUrl).isPresent();
     }
+
+    @Override
+    public void imageAdded(String id) {
+        repository.get(id).ifPresent(episodeImageEntity -> {
+            episodeImageEntity.imageAdded();
+            repository.save(episodeImageEntity);
+            remoteImagesGateway.expose(episodeImageEntity);
+            episodeImageEntity.startExposing();
+            repository.save(episodeImageEntity);
+        });
+    }
 }

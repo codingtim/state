@@ -41,17 +41,39 @@ class EpisodeImageServiceImplTest {
         //TODO hamcrest~ matcher that flowState is contained?
     }
 
+    @Test
+    void imageAdded() {
+        EpisodeImageEntity image = new EpisodeImageEntity("eps1", "some.url");
+        image.startProcessing();
+        repository.save(image);
+
+        service.imageAdded(image.getId());
+        assertSame(true, remoteImagesGateway.hasBeenExposed(image));
+        assertSame(State.PROCESSING, image.getState());
+        //TODO hamcrest~ matcher that flowState is contained?
+    }
+
     private static class StubImagesGateway implements RemoteImagesGateway {
 
         private List<String> requestedImages = new ArrayList<>();
+        private List<String> exposedImages = new ArrayList<>();
 
         @Override
         public void addImage(EpisodeImageEntity episodeImageEntity) {
             requestedImages.add(episodeImageEntity.getId());
         }
 
+        @Override
+        public void expose(EpisodeImageEntity episodeImageEntity) {
+            exposedImages.add(episodeImageEntity.getId());
+        }
+
         public boolean hasBeenRequested(EpisodeImageEntity episodeImageEntity) {
             return requestedImages.contains(episodeImageEntity.getId());
+        }
+
+        public boolean hasBeenExposed(EpisodeImageEntity episodeImageEntity) {
+            return exposedImages.contains(episodeImageEntity.getId());
         }
     }
 
@@ -84,6 +106,11 @@ class EpisodeImageServiceImplTest {
         public void save(EpisodeImageEntity episodeImageEntity) {
             map.put(new EpisodeImageIdentifier(episodeImageEntity.getEpisodeId(), episodeImageEntity.getEpgImageUrl()),
                     episodeImageEntity);
+        }
+
+        @Override
+        public Optional<EpisodeImageEntity> get(String id) {
+            return map.values().stream().filter(episodeImageEntity -> episodeImageEntity.getId().equals(id)).findFirst();
         }
     }
 

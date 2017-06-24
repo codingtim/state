@@ -90,4 +90,12 @@ public class EpisodeImageEntity {
         state = State.PROCESSING;
         addFlowState(FlowState.PROCESS_IMAGE_SCHEDULED);
     }
+
+    public void imageAdded() {
+        addFlowState(FlowState.PROCESS_IMAGE_FINISHED);
+    }
+
+    public void startExposing() {
+        addFlowState(FlowState.EXPOSE_IMAGE_SCHEDULED);
+    }
 }
