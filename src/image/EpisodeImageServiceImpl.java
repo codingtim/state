@@ -64,10 +64,12 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
             repository.save(episodeImageEntity);
             episodeService.findById(episodeImageEntity.getEpisodeId()).ifPresent(episodeEntity -> {
                 episodeImageEntity.creatingEditorialObject();
-                remoteCatalogGateway.createEditorialObject(episodeImageEntity, episodeEntity);
-                episodeImageEntity.editorialObjectCreated();
+                if (remoteCatalogGateway.createEditorialObject(episodeImageEntity, episodeEntity)) {
+                    episodeImageEntity.editorialObjectCreated();
+                } else {
+                    episodeImageEntity.editorialObjectCreationFailed();
+                }
                 repository.save(episodeImageEntity);
-                //TODO some error handling
             });
         });
     }

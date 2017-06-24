@@ -5,5 +5,5 @@ import image.model.EpisodeImageEntity;
 
 public interface RemoteCatalogGateway {
 
-    void createEditorialObject(EpisodeImageEntity episodeImageEntity, EpisodeEntity episodeEntity);
+    boolean createEditorialObject(EpisodeImageEntity episodeImageEntity, EpisodeEntity episodeEntity);
 }

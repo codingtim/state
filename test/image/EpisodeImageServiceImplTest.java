@@ -70,6 +70,20 @@ class EpisodeImageServiceImplTest {
         assertTrue(remoteCatalogGateway.editorialObjectWasCreatedFor(episodeImage));
     }
 
+    @Test
+    void imageExposed_editorialObjectCreationFails() {
+        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url");
+        episodeImage.startProcessing();
+        episodeImage.imageAdded("remoteImage1");
+        repository.save(episodeImage);
+        remoteCatalogGateway.setCreationToUnsuccessful();
+
+        service.imageExposed(episodeImage.getId());
+        assertSame(State.PROCESSING_FAILED, episodeImage.getState());
+        assertTrue(hasFlowStates(episodeImage, FlowState.EXPOSE_IMAGE_FINISHED, FlowState.PROCESS_EO_STARTED, FlowState.PROCESS_EO_FAILED));
+        assertTrue(remoteCatalogGateway.editorialObjectWasCreatedFor(episodeImage));
+    }
+
     private boolean hasFlowStates(EpisodeImageEntity episodeImage, FlowState... expected) {
         return Stream.of(expected)
                 .allMatch(flowState -> hasFlowState(episodeImage, flowState));

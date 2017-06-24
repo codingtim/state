@@ -112,4 +112,9 @@ public class EpisodeImageEntity {
         addFlowState(FlowState.PROCESS_EO_FINISHED);
         state = State.PROCESSED;
     }
+
+    public void editorialObjectCreationFailed() {
+        addFlowState(FlowState.PROCESS_EO_FAILED);
+        state = State.PROCESSING_FAILED;
+    }
 }
