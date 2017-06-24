@@ -12,11 +12,13 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
     private EpisodeImageRepository repository;
     private EpisodeService episodeService;
     private RemoteImagesGateway remoteImagesGateway;
+    private RemoteCatalogGateway remoteCatalogGateway;
 
-    public EpisodeImageServiceImpl(EpisodeImageRepository repository, EpisodeService episodeService, RemoteImagesGateway remoteImagesGateway) {
+    public EpisodeImageServiceImpl(EpisodeImageRepository repository, EpisodeService episodeService, RemoteImagesGateway remoteImagesGateway, RemoteCatalogGateway remoteCatalogGateway) {
         this.repository = repository;
         this.episodeService = episodeService;
         this.remoteImagesGateway = remoteImagesGateway;
+        this.remoteCatalogGateway = remoteCatalogGateway;
     }
 
     @Override
@@ -52,6 +54,21 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
             remoteImagesGateway.expose(episodeImageEntity);
             episodeImageEntity.startExposing();
             repository.save(episodeImageEntity);
+        });
+    }
+
+    @Override
+    public void imageExposed(String id) {
+        repository.get(id).ifPresent(episodeImageEntity -> {
+            episodeImageEntity.imageExposed();
+            repository.save(episodeImageEntity);
+            episodeService.findById(episodeImageEntity.getEpisodeId()).ifPresent(episodeEntity -> {
+                episodeImageEntity.creatingEditorialObject();
+                remoteCatalogGateway.createEditorialObject(episodeImageEntity, episodeEntity);
+                episodeImageEntity.editorialObjectCreated();
+                repository.save(episodeImageEntity);
+                //TODO some error handling
+            });
         });
     }
 }

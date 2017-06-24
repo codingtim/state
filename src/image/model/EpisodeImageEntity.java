@@ -99,4 +99,17 @@ public class EpisodeImageEntity {
     public void startExposing() {
         addFlowState(FlowState.EXPOSE_IMAGE_SCHEDULED);
     }
+
+    public void imageExposed() {
+        addFlowState(FlowState.EXPOSE_IMAGE_FINISHED);
+    }
+
+    public void creatingEditorialObject() {
+        addFlowState(FlowState.PROCESS_EO_STARTED);
+    }
+
+    public void editorialObjectCreated() {
+        addFlowState(FlowState.PROCESS_EO_FINISHED);
+        state = State.PROCESSED;
+    }
 }

@@ -10,4 +10,5 @@ public interface EpisodeImageService {
 
     void imageAdded(String id, String remoteImageId);
 
+    void imageExposed(String id);
 }

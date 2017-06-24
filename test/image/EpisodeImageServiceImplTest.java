@@ -19,6 +19,7 @@ class EpisodeImageServiceImplTest {
     private EpisodeImageServiceImpl service;
     private StubEpisodeImageRepository repository;
     private StubImagesGateway remoteImagesGateway;
+    private StubCatalogGateway remoteCatalogGateway;
 
     @BeforeEach
     void setUp() {
@@ -26,7 +27,8 @@ class EpisodeImageServiceImplTest {
         StubEpisodeService episodeService = new StubEpisodeService();
         episodeService.add(new EpisodeEntity("eps1", "w1"));
         remoteImagesGateway = new StubImagesGateway();
-        service = new EpisodeImageServiceImpl(repository, episodeService, remoteImagesGateway);
+        remoteCatalogGateway = new StubCatalogGateway();
+        service = new EpisodeImageServiceImpl(repository, episodeService, remoteImagesGateway, remoteCatalogGateway);
     }
 
     @Test
@@ -53,6 +55,19 @@ class EpisodeImageServiceImplTest {
         assertSame(State.PROCESSING, episodeImage.getState());
         assertTrue(hasFlowStates(episodeImage, FlowState.PROCESS_IMAGE_FINISHED, FlowState.EXPOSE_IMAGE_SCHEDULED));
         assertSame("remoteImage1", episodeImage.getImageServiceId());
+    }
+
+    @Test
+    void imageExposed() {
+        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url");
+        episodeImage.startProcessing();
+        episodeImage.imageAdded("remoteImage1");
+        repository.save(episodeImage);
+
+        service.imageExposed(episodeImage.getId());
+        assertSame(State.PROCESSED, episodeImage.getState());
+        assertTrue(hasFlowStates(episodeImage, FlowState.EXPOSE_IMAGE_FINISHED, FlowState.PROCESS_EO_STARTED, FlowState.PROCESS_EO_FINISHED));
+        assertTrue(remoteCatalogGateway.editorialObjectWasCreatedFor(episodeImage));
     }
 
     private boolean hasFlowStates(EpisodeImageEntity episodeImage, FlowState... expected) {

@@ -17,6 +17,13 @@ class StubEpisodeService implements EpisodeService {
                 .findFirst();
     }
 
+    @Override
+    public Optional<EpisodeEntity> findById(String id) {
+        return list.stream()
+                .filter(episodeEntity -> episodeEntity.getId().equals(id))
+                .findFirst();
+    }
+
     public void add(EpisodeEntity episodeEntity) {
         list.add(episodeEntity);
     }
