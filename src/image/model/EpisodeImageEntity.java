@@ -3,9 +3,11 @@ package image.model;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 public class EpisodeImageEntity {
 
+    private String id = UUID.randomUUID().toString();
     private String episodeId;
     private String imageServiceId;
     private String epgImageUrl;
@@ -19,6 +21,10 @@ public class EpisodeImageEntity {
     public EpisodeImageEntity(String episodeId, String epgImageUrl) {
         this.episodeId = episodeId;
         this.epgImageUrl = epgImageUrl;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getImageServiceId() {
@@ -78,5 +84,10 @@ public class EpisodeImageEntity {
 
     public void setEditorialObjectId(String editorialObjectId) {
         this.editorialObjectId = editorialObjectId;
+    }
+
+    public void startProcessing() {
+        state = State.PROCESSING;
+        addFlowState(FlowState.PROCESS_IMAGE_SCHEDULED);
     }
 }

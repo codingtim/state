@@ -11,10 +11,12 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
 
     private EpisodeImageRepository repository;
     private EpisodeService episodeService;
+    private RemoteImagesGateway remoteImagesGateway;
 
-    public EpisodeImageServiceImpl(EpisodeImageRepository repository, EpisodeService episodeService) {
+    public EpisodeImageServiceImpl(EpisodeImageRepository repository, EpisodeService episodeService, RemoteImagesGateway remoteImagesGateway) {
         this.repository = repository;
         this.episodeService = episodeService;
+        this.remoteImagesGateway = remoteImagesGateway;
     }
 
     @Override
@@ -31,6 +33,9 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
     private void createImageForEpisode(EpisodeEntity episodeEntity, String imageUrl) {
         if(imageDoesNotExistsForEpisode(episodeEntity, imageUrl)) {
             EpisodeImageEntity episodeImageEntity = new EpisodeImageEntity(episodeEntity.getId(), imageUrl);
+            repository.save(episodeImageEntity);
+            remoteImagesGateway.addImage(episodeImageEntity);
+            episodeImageEntity.startProcessing();
             repository.save(episodeImageEntity);
         }
     }

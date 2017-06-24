@@ -3,6 +3,7 @@ package image;
 import episode.EpisodeEntity;
 import episode.EpisodeService;
 import image.model.EpisodeImageEntity;
+import image.model.State;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,17 +11,21 @@ import scrape.ScrapedEpisodeEntity;
 
 import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 class EpisodeImageServiceImplTest {
 
     private EpisodeImageServiceImpl service;
     private StubEpisodeImageRepository repository;
+    private StubImagesGateway remoteImagesGateway;
 
     @BeforeEach
     void setUp() {
         repository = new StubEpisodeImageRepository();
         StubEpisodeService episodeService = new StubEpisodeService();
         episodeService.add(new EpisodeEntity("eps1", "w1"));
-        service = new EpisodeImageServiceImpl(repository, episodeService);
+        remoteImagesGateway = new StubImagesGateway();
+        service = new EpisodeImageServiceImpl(repository, episodeService, remoteImagesGateway);
     }
 
     @Test
@@ -29,7 +34,25 @@ class EpisodeImageServiceImplTest {
 
         service.createImages(Collections.singletonList(scrapedEpisodeEntity));
         Optional<EpisodeImageEntity> result = repository.findByEpisodeIdAndImageUrl("eps1", "http://some.image.com");
-        Assertions.assertSame(true, result.isPresent());
+        assertSame(true, result.isPresent());
+        EpisodeImageEntity episodeImageEntity = result.get();
+        assertSame(true, remoteImagesGateway.hasBeenRequested(episodeImageEntity));
+        assertSame(State.PROCESSING, episodeImageEntity.getState());
+        //TODO hamcrest~ matcher that flowState is contained?
+    }
+
+    private static class StubImagesGateway implements RemoteImagesGateway {
+
+        private List<String> requestedImages = new ArrayList<>();
+
+        @Override
+        public void addImage(EpisodeImageEntity episodeImageEntity) {
+            requestedImages.add(episodeImageEntity.getId());
+        }
+
+        public boolean hasBeenRequested(EpisodeImageEntity episodeImageEntity) {
+            return requestedImages.contains(episodeImageEntity.getId());
+        }
     }
 
     private static class StubEpisodeService implements EpisodeService {
