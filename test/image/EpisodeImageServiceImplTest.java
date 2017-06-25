@@ -28,7 +28,7 @@ class EpisodeImageServiceImplTest {
         remoteImagesGateway = new StubImagesGateway();
         remoteCatalogGateway = new StubCatalogGateway();
         processFlowStates = new ProcessFlowStates(remoteImagesGateway);
-        service = new EpisodeImageServiceImpl(processFlowStates, repository, episodeService, remoteImagesGateway, remoteCatalogGateway);
+        service = new EpisodeImageServiceImpl(processFlowStates, repository, episodeService, remoteCatalogGateway);
     }
 
     @Test
