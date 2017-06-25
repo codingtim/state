@@ -91,7 +91,12 @@ public class EpisodeImageEntity {
     }
 
     public void startProcessing() {
-        currentState.startProcessing(this);
+        ProcessFlowState newState = currentState.startProcessing();
+        //if we're already processing null will be returned
+        if(newState != null) {
+            currentState = newState;
+            currentState.stateEntered(this);
+        }
     }
 
     void processing(FlowState flowState) {

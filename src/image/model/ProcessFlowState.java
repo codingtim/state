@@ -1,5 +1,7 @@
 package image.model;
 
 public interface ProcessFlowState {
-    void startProcessing(EpisodeImageEntity episodeImageEntity);
+    ProcessFlowState startProcessing();
+
+    void stateEntered(EpisodeImageEntity episodeImageEntity);
 }
