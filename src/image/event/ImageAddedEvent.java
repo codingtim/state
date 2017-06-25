@@ -13,7 +13,7 @@ public class ImageAddedEvent extends EpisodeImageProcessEvent {
         return new ImageAddedEvent(true, remoteImageId);
     }
 
-    public static EpisodeImageProcessEvent failure() {
+    public static ImageAddedEvent failure() {
         return new ImageAddedEvent(false, null);
     }
 

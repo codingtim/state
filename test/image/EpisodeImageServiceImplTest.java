@@ -50,7 +50,7 @@ class EpisodeImageServiceImplTest {
         episodeImage.startProcessing();
         repository.save(episodeImage);
 
-        service.imageAdded(episodeImage.getId(), "remoteImage1");
+        service.imageEvent(episodeImage.getId(), ImageAddedEvent.success("remoteImage1"));
         assertTrue(remoteImagesGateway.hasBeenExposed(episodeImage));
         assertSame(State.PROCESSING, episodeImage.getState());
         assertTrue(hasFlowStates(episodeImage, FlowState.PROCESS_IMAGE_FINISHED, FlowState.EXPOSE_IMAGE_SCHEDULED));
@@ -63,7 +63,7 @@ class EpisodeImageServiceImplTest {
         episodeImage.startProcessing();
         repository.save(episodeImage);
 
-        service.imageAddFailed(episodeImage.getId());
+        service.imageEvent(episodeImage.getId(), ImageAddedEvent.failure());
         assertFalse(remoteImagesGateway.hasBeenExposed(episodeImage));
         assertSame(State.PROCESSING_FAILED, episodeImage.getState());
         assertTrue(hasFlowStates(episodeImage, FlowState.PROCESS_IMAGE_FAILED));
