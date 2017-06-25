@@ -2,6 +2,7 @@ package image;
 
 import episode.EpisodeEntity;
 import episode.EpisodeService;
+import image.event.EpisodeImageProcessEvent;
 import image.event.ImageExposedEvent;
 import image.model.EpisodeImageEntity;
 import image.event.ImageAddedEvent;
@@ -48,26 +49,13 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
     }
 
     @Override
-    public void imageEvent(String id, ImageAddedEvent imageAddedEvent) {
+    public void processEvent(String id, EpisodeImageProcessEvent imageAddedEvent) {
         repository.get(id).ifPresent(episodeImageEntity -> {
-            episodeImageEntity.episodeImageProcessEventHappened(imageAddedEvent);
-            repository.save(episodeImageEntity);
-        });
-    }
-
-    @Override
-    public void imageExposed(String id) {
-        repository.get(id).ifPresent(episodeImageEntity -> {
-            episodeImageEntity.episodeImageProcessEventHappened(ImageExposedEvent.success());
-            repository.save(episodeImageEntity);
-        });
-    }
-
-    @Override
-    public void imageExposedFailed(String id) {
-        repository.get(id).ifPresent(episodeImageEntity -> {
-            episodeImageEntity.episodeImageProcessEventHappened(ImageExposedEvent.failure());
-            repository.save(episodeImageEntity);
+            try {
+                episodeImageEntity.episodeImageProcessEventHappened(imageAddedEvent);
+            } finally {
+                repository.save(episodeImageEntity);
+            }
         });
     }
 }

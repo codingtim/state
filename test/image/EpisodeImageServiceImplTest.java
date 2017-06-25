@@ -2,12 +2,14 @@ package image;
 
 import episode.EpisodeEntity;
 import image.event.ImageAddedEvent;
+import image.event.ImageExposedEvent;
 import image.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import scrape.ScrapedEpisodeEntity;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -50,7 +52,7 @@ class EpisodeImageServiceImplTest {
         episodeImage.startProcessing();
         repository.save(episodeImage);
 
-        service.imageEvent(episodeImage.getId(), ImageAddedEvent.success("remoteImage1"));
+        service.processEvent(episodeImage.getId(), ImageAddedEvent.success("remoteImage1"));
         assertTrue(remoteImagesGateway.hasBeenExposed(episodeImage));
         assertSame(State.PROCESSING, episodeImage.getState());
         assertTrue(hasFlowStates(episodeImage, FlowState.PROCESS_IMAGE_FINISHED, FlowState.EXPOSE_IMAGE_SCHEDULED));
@@ -63,7 +65,7 @@ class EpisodeImageServiceImplTest {
         episodeImage.startProcessing();
         repository.save(episodeImage);
 
-        service.imageEvent(episodeImage.getId(), ImageAddedEvent.failure());
+        service.processEvent(episodeImage.getId(), ImageAddedEvent.failure());
         assertFalse(remoteImagesGateway.hasBeenExposed(episodeImage));
         assertSame(State.PROCESSING_FAILED, episodeImage.getState());
         assertTrue(hasFlowStates(episodeImage, FlowState.PROCESS_IMAGE_FAILED));
@@ -76,7 +78,7 @@ class EpisodeImageServiceImplTest {
         episodeImage.episodeImageProcessEventHappened(ImageAddedEvent.success("remoteImage1"));
         repository.save(episodeImage);
 
-        service.imageExposed(episodeImage.getId());
+        service.processEvent(episodeImage.getId(), ImageExposedEvent.success());
         assertSame(State.PROCESSED, episodeImage.getState());
         assertTrue(hasFlowStates(episodeImage, FlowState.EXPOSE_IMAGE_FINISHED, FlowState.PROCESS_EO_STARTED, FlowState.PROCESS_EO_FINISHED));
         assertTrue(remoteCatalogGateway.editorialObjectWasCreatedFor(episodeImage));
@@ -89,7 +91,7 @@ class EpisodeImageServiceImplTest {
         episodeImage.episodeImageProcessEventHappened(ImageAddedEvent.success("remoteImage1"));
         repository.save(episodeImage);
 
-        service.imageExposedFailed(episodeImage.getId());
+        service.processEvent(episodeImage.getId(), ImageExposedEvent.failure());
         assertSame(State.PROCESSING_FAILED, episodeImage.getState());
         assertTrue(hasFlowStates(episodeImage, FlowState.EXPOSE_IMAGE_FAILED));
         assertFalse(remoteCatalogGateway.editorialObjectWasCreatedFor(episodeImage));
@@ -103,7 +105,7 @@ class EpisodeImageServiceImplTest {
         repository.save(episodeImage);
         remoteCatalogGateway.setCreationToUnsuccessful();
 
-        service.imageExposed(episodeImage.getId());
+        service.processEvent(episodeImage.getId(), ImageExposedEvent.success());
         assertSame(State.PROCESSING_FAILED, episodeImage.getState());
         assertTrue(hasFlowStates(episodeImage, FlowState.EXPOSE_IMAGE_FINISHED, FlowState.PROCESS_EO_STARTED, FlowState.PROCESS_EO_FAILED));
         assertTrue(remoteCatalogGateway.editorialObjectWasCreatedFor(episodeImage));
