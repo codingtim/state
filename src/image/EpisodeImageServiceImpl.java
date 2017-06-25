@@ -3,18 +3,21 @@ package image;
 import episode.EpisodeEntity;
 import episode.EpisodeService;
 import image.model.EpisodeImageEntity;
+import image.model.ProcessFlowStates;
 import scrape.ScrapedEpisodeEntity;
 
 import java.util.List;
 
 public class EpisodeImageServiceImpl implements EpisodeImageService {
 
+    private ProcessFlowStates processFlowStates;
     private EpisodeImageRepository repository;
     private EpisodeService episodeService;
     private RemoteImagesGateway remoteImagesGateway;
     private RemoteCatalogGateway remoteCatalogGateway;
 
-    public EpisodeImageServiceImpl(EpisodeImageRepository repository, EpisodeService episodeService, RemoteImagesGateway remoteImagesGateway, RemoteCatalogGateway remoteCatalogGateway) {
+    public EpisodeImageServiceImpl(ProcessFlowStates processFlowStates, EpisodeImageRepository repository, EpisodeService episodeService, RemoteImagesGateway remoteImagesGateway, RemoteCatalogGateway remoteCatalogGateway) {
+        this.processFlowStates = processFlowStates;
         this.repository = repository;
         this.episodeService = episodeService;
         this.remoteImagesGateway = remoteImagesGateway;
@@ -34,9 +37,7 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
 
     private void createImageForEpisode(EpisodeEntity episodeEntity, String imageUrl) {
         if(imageDoesNotExistsForEpisode(episodeEntity, imageUrl)) {
-            EpisodeImageEntity episodeImageEntity = new EpisodeImageEntity(episodeEntity.getId(), imageUrl);
-            repository.save(episodeImageEntity);
-            remoteImagesGateway.addImage(episodeImageEntity);
+            EpisodeImageEntity episodeImageEntity = new EpisodeImageEntity(episodeEntity.getId(), imageUrl, processFlowStates);
             episodeImageEntity.startProcessing();
             repository.save(episodeImageEntity);
         }

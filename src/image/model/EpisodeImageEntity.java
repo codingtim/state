@@ -18,9 +18,13 @@ public class EpisodeImageEntity {
     private State state = State.NEW;
     private List<ProcessFlowStateEntity> flowStates = new LinkedList<>();
 
-    public EpisodeImageEntity(String episodeId, String epgImageUrl) {
+    //transient
+    private ProcessFlowState currentState;
+
+    public EpisodeImageEntity(String episodeId, String epgImageUrl, ProcessFlowStates processFlowStates) {
         this.episodeId = episodeId;
         this.epgImageUrl = epgImageUrl;
+        currentState = processFlowStates.newState();
     }
 
     public String getId() {
@@ -87,6 +91,7 @@ public class EpisodeImageEntity {
     }
 
     public void startProcessing() {
+        currentState.startProcessing(this);
         state = State.PROCESSING;
         addFlowState(FlowState.PROCESS_IMAGE_SCHEDULED);
     }

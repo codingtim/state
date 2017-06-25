@@ -1,10 +1,7 @@
 package image;
 
 import episode.EpisodeEntity;
-import image.model.EpisodeImageEntity;
-import image.model.FlowState;
-import image.model.ProcessFlowStateEntity;
-import image.model.State;
+import image.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import scrape.ScrapedEpisodeEntity;
@@ -20,6 +17,7 @@ class EpisodeImageServiceImplTest {
     private StubEpisodeImageRepository repository;
     private StubImagesGateway remoteImagesGateway;
     private StubCatalogGateway remoteCatalogGateway;
+    private ProcessFlowStates processFlowStates;
 
     @BeforeEach
     void setUp() {
@@ -28,7 +26,8 @@ class EpisodeImageServiceImplTest {
         episodeService.add(new EpisodeEntity("eps1", "w1"));
         remoteImagesGateway = new StubImagesGateway();
         remoteCatalogGateway = new StubCatalogGateway();
-        service = new EpisodeImageServiceImpl(repository, episodeService, remoteImagesGateway, remoteCatalogGateway);
+        processFlowStates = new ProcessFlowStates(remoteImagesGateway);
+        service = new EpisodeImageServiceImpl(processFlowStates, repository, episodeService, remoteImagesGateway, remoteCatalogGateway);
     }
 
     @Test
@@ -46,7 +45,7 @@ class EpisodeImageServiceImplTest {
 
     @Test
     void imageAdded() {
-        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url");
+        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url", processFlowStates);
         episodeImage.startProcessing();
         repository.save(episodeImage);
 
@@ -59,7 +58,7 @@ class EpisodeImageServiceImplTest {
 
     @Test
     void imageAddFailed() {
-        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url");
+        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url", processFlowStates);
         episodeImage.startProcessing();
         repository.save(episodeImage);
 
@@ -71,7 +70,7 @@ class EpisodeImageServiceImplTest {
 
     @Test
     void imageExposed() {
-        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url");
+        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url", processFlowStates);
         episodeImage.startProcessing();
         episodeImage.imageAdded("remoteImage1");
         repository.save(episodeImage);
@@ -84,7 +83,7 @@ class EpisodeImageServiceImplTest {
 
     @Test
     void imageExposureFailed() {
-        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url");
+        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url", processFlowStates);
         episodeImage.startProcessing();
         episodeImage.imageAdded("remoteImage1");
         repository.save(episodeImage);
@@ -97,7 +96,7 @@ class EpisodeImageServiceImplTest {
 
     @Test
     void imageExposed_editorialObjectCreationFails() {
-        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url");
+        EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url", processFlowStates);
         episodeImage.startProcessing();
         episodeImage.imageAdded("remoteImage1");
         repository.save(episodeImage);
