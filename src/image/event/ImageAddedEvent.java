@@ -13,6 +13,10 @@ public class ImageAddedEvent extends EpisodeImageProcessEvent {
         return new ImageAddedEvent(true, remoteImageId);
     }
 
+    public static EpisodeImageProcessEvent failure() {
+        return new ImageAddedEvent(false, null);
+    }
+
     public String getRemoteImageId() {
         return remoteImageId;
     }

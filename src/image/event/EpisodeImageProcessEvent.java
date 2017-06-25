@@ -9,4 +9,8 @@ public abstract class EpisodeImageProcessEvent {
     }
 
     public abstract <IN, OUT> OUT accept(EpisodeImageProcessEventVisitor<IN, OUT> visitor, IN in);
+
+    public boolean wasSuccessful() {
+        return success;
+    }
 }

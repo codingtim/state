@@ -55,8 +55,13 @@ public class ProcessFlowStates {
 
         @Override
         public ProcessFlowState imageAddedEvent(ImageAddedEvent imageAddedEvent, EpisodeImageEntity episodeImageEntity) {
-            episodeImageEntity.imageAdded(imageAddedEvent.getRemoteImageId());
-            return new ExposeImageState();
+            if(imageAddedEvent.wasSuccessful()) {
+                episodeImageEntity.imageAdded(imageAddedEvent.getRemoteImageId());
+                return new ExposeImageState();
+            } else {
+                episodeImageEntity.processFailure(FlowState.PROCESS_IMAGE_FAILED);
+                return new FailedState();
+            }
         }
     }
 
@@ -81,6 +86,23 @@ public class ProcessFlowStates {
         @Override
         public ProcessFlowState imageAddedEvent(ImageAddedEvent imageAddedEvent, EpisodeImageEntity episodeImageEntity) {
             return null; //ExposeImageState is not interested in image events
+        }
+    }
+
+    private class FailedState implements ProcessFlowState {
+        @Override
+        public ProcessFlowState startProcessing() {
+            return null;
+        }
+
+        @Override
+        public void stateEntered(EpisodeImageEntity episodeImageEntity) {
+
+        }
+
+        @Override
+        public ProcessFlowState eventHappened(EpisodeImageEntity episodeImageEntity, EpisodeImageProcessEvent event) {
+            return null;
         }
     }
 }
