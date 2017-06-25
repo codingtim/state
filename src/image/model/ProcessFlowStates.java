@@ -1,8 +1,8 @@
 package image.model;
 
 import episode.EpisodeService;
-import image.RemoteCatalogGateway;
-import image.RemoteImagesGateway;
+import image.gateway.RemoteCatalogGateway;
+import image.gateway.RemoteImagesGateway;
 import image.event.*;
 
 public class ProcessFlowStates {

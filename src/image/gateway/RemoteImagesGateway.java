@@ -1,4 +1,4 @@
-package image;
+package image.gateway;
 
 import image.model.EpisodeImageEntity;
 

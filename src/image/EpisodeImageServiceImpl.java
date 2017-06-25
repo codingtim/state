@@ -3,9 +3,8 @@ package image;
 import episode.EpisodeEntity;
 import episode.EpisodeService;
 import image.event.EpisodeImageProcessEvent;
-import image.event.ImageExposedEvent;
+import image.gateway.EpisodeImageRepository;
 import image.model.EpisodeImageEntity;
-import image.event.ImageAddedEvent;
 import image.model.ProcessFlowStates;
 import scrape.ScrapedEpisodeEntity;
 

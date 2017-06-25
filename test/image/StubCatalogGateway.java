@@ -1,6 +1,7 @@
 package image;
 
 import episode.EpisodeEntity;
+import image.gateway.RemoteCatalogGateway;
 import image.model.EpisodeImageEntity;
 
 import java.util.ArrayList;

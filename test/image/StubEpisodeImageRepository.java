@@ -1,5 +1,6 @@
 package image;
 
+import image.gateway.EpisodeImageRepository;
 import image.model.EpisodeImageEntity;
 
 import java.util.HashMap;
