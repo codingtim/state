@@ -1,16 +1,20 @@
 package image.model;
 
+import episode.EpisodeService;
+import image.RemoteCatalogGateway;
 import image.RemoteImagesGateway;
-import image.event.EpisodeImageProcessEvent;
-import image.event.EpisodeImageProcessEventVisitor;
-import image.event.ImageAddedEvent;
+import image.event.*;
 
 public class ProcessFlowStates {
 
     private RemoteImagesGateway remoteImagesGateway;
+    private EpisodeService episodeService;
+    private RemoteCatalogGateway remoteCatalogGateway;
 
-    public ProcessFlowStates(RemoteImagesGateway remoteImagesGateway) {
+    public ProcessFlowStates(RemoteImagesGateway remoteImagesGateway, EpisodeService episodeService, RemoteCatalogGateway remoteCatalogGateway) {
         this.remoteImagesGateway = remoteImagesGateway;
+        this.episodeService = episodeService;
+        this.remoteCatalogGateway = remoteCatalogGateway;
     }
 
     ProcessFlowState newState() {
@@ -84,9 +88,45 @@ public class ProcessFlowStates {
         }
 
         @Override
-        public ProcessFlowState imageAddedEvent(ImageAddedEvent imageAddedEvent, EpisodeImageEntity episodeImageEntity) {
-            return null; //ExposeImageState is not interested in image events
+        public ProcessFlowState imageExposedEvent(ImageExposedEvent imageExposedEvent, EpisodeImageEntity episodeImageEntity) {
+            episodeImageEntity.imageExposed();
+            return new CreateEditorialObjectState();
         }
+    }
+
+    private class CreateEditorialObjectState implements ProcessFlowState, EpisodeImageProcessEventVisitor<EpisodeImageEntity, ProcessFlowState> {
+
+        @Override
+        public ProcessFlowState startProcessing() {
+            return null; //already processing
+        }
+        @Override
+        public void stateEntered(EpisodeImageEntity episodeImageEntity) {
+            episodeImageEntity.processing(FlowState.PROCESS_EO_STARTED);
+            episodeService.findById(episodeImageEntity.getEpisodeId()).ifPresent(episodeEntity -> {
+                boolean success = remoteCatalogGateway.createEditorialObject(episodeImageEntity, episodeEntity);
+                episodeImageEntity.episodeImageProcessEventHappened(success ?
+                        EditorialObjectCreatedEvent.success() : EditorialObjectCreatedEvent.failure()
+                );
+            });
+        }
+
+        @Override
+        public ProcessFlowState eventHappened(EpisodeImageEntity episodeImageEntity, EpisodeImageProcessEvent event) {
+            return event.accept(this, episodeImageEntity);
+        }
+
+        @Override
+        public ProcessFlowState editorialObjectCreatedEvent(EditorialObjectCreatedEvent editorialObjectCreatedEvent, EpisodeImageEntity episodeImageEntity) {
+            if(editorialObjectCreatedEvent.wasSuccessful()) {
+                episodeImageEntity.editorialObjectCreated();
+                return new CompletedState();
+            } else {
+                episodeImageEntity.processFailure(FlowState.PROCESS_EO_FAILED);
+                return new FailedState();
+            }
+        }
+
     }
 
     private class FailedState implements ProcessFlowState {
@@ -98,6 +138,23 @@ public class ProcessFlowStates {
         @Override
         public void stateEntered(EpisodeImageEntity episodeImageEntity) {
 
+        }
+
+        @Override
+        public ProcessFlowState eventHappened(EpisodeImageEntity episodeImageEntity, EpisodeImageProcessEvent event) {
+            return null;
+        }
+    }
+
+    private class CompletedState implements ProcessFlowState {
+        @Override
+        public ProcessFlowState startProcessing() {
+            return null;
+        }
+
+        @Override
+        public void stateEntered(EpisodeImageEntity episodeImageEntity) {
+            episodeImageEntity.processCompleted();
         }
 
         @Override

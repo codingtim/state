@@ -2,6 +2,7 @@ package image;
 
 import episode.EpisodeEntity;
 import episode.EpisodeService;
+import image.event.ImageExposedEvent;
 import image.model.EpisodeImageEntity;
 import image.event.ImageAddedEvent;
 import image.model.ProcessFlowStates;
@@ -57,17 +58,8 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
     @Override
     public void imageExposed(String id) {
         repository.get(id).ifPresent(episodeImageEntity -> {
-            episodeImageEntity.imageExposed();
+            episodeImageEntity.episodeImageProcessEventHappened(ImageExposedEvent.success());
             repository.save(episodeImageEntity);
-            episodeService.findById(episodeImageEntity.getEpisodeId()).ifPresent(episodeEntity -> {
-                episodeImageEntity.creatingEditorialObject();
-                if (remoteCatalogGateway.createEditorialObject(episodeImageEntity, episodeEntity)) {
-                    episodeImageEntity.editorialObjectCreated();
-                } else {
-                    episodeImageEntity.editorialObjectCreationFailed();
-                }
-                repository.save(episodeImageEntity);
-            });
         });
     }
 

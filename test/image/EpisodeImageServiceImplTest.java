@@ -27,7 +27,7 @@ class EpisodeImageServiceImplTest {
         episodeService.add(new EpisodeEntity("eps1", "w1"));
         remoteImagesGateway = new StubImagesGateway();
         remoteCatalogGateway = new StubCatalogGateway();
-        processFlowStates = new ProcessFlowStates(remoteImagesGateway);
+        processFlowStates = new ProcessFlowStates(remoteImagesGateway, episodeService, remoteCatalogGateway);
         service = new EpisodeImageServiceImpl(processFlowStates, repository, episodeService, remoteCatalogGateway);
     }
 

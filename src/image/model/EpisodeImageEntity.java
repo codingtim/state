@@ -111,27 +111,18 @@ public class EpisodeImageEntity {
         addFlowState(FlowState.PROCESS_IMAGE_FINISHED);
     }
 
-    public void processFailure(FlowState flowState) {
+    void processFailure(FlowState flowState) {
         addFlowState(flowState);
         state = State.PROCESSING_FAILED;
     }
 
-    public void imageExposed() {
+    void imageExposed() {
         addFlowState(FlowState.EXPOSE_IMAGE_FINISHED);
     }
 
-    public void creatingEditorialObject() {
-        addFlowState(FlowState.PROCESS_EO_STARTED);
-    }
-
-    public void editorialObjectCreated() {
+    void editorialObjectCreated() {
         addFlowState(FlowState.PROCESS_EO_FINISHED);
         state = State.PROCESSED;
-    }
-
-    public void editorialObjectCreationFailed() {
-        addFlowState(FlowState.PROCESS_EO_FAILED);
-        state = State.PROCESSING_FAILED;
     }
 
     public void imageExposureFailed() {
@@ -145,5 +136,9 @@ public class EpisodeImageEntity {
             currentState = newState;
             newState.stateEntered(this);
         }
+    }
+
+    void processCompleted() {
+        state = State.PROCESSED;
     }
 }
