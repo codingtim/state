@@ -11,33 +11,37 @@ public class ProcessFlowStates {
     }
 
     ProcessFlowState newState() {
-        return new ProcessFlowState() {
-
-            @Override
-            public ProcessFlowState startProcessing() {
-                return addImagesState();
-            }
-
-            @Override
-            public void stateEntered(EpisodeImageEntity episodeImageEntity) {
-                //nothing to do
-            }
-        };
+        return new NewState();
     }
 
     private ProcessFlowState addImagesState() {
-        return new ProcessFlowState() {
+        return new AddImageState();
+    }
 
-            @Override
-            public ProcessFlowState startProcessing() {
-                return null; //we're already processing
-            }
+    private class NewState implements ProcessFlowState {
 
-            @Override
-            public void stateEntered(EpisodeImageEntity episodeImageEntity) {
-                remoteImagesGateway.addImage(episodeImageEntity);
-                episodeImageEntity.processing(FlowState.PROCESS_IMAGE_SCHEDULED);
-            }
-        };
+        @Override
+        public ProcessFlowState startProcessing() {
+            return addImagesState();
+        }
+
+        @Override
+        public void stateEntered(EpisodeImageEntity episodeImageEntity) {
+            //nothing to do
+        }
+    }
+
+    private class AddImageState implements ProcessFlowState {
+
+        @Override
+        public ProcessFlowState startProcessing() {
+            return null; //we're already processing
+        }
+
+        @Override
+        public void stateEntered(EpisodeImageEntity episodeImageEntity) {
+            remoteImagesGateway.addImage(episodeImageEntity);
+            episodeImageEntity.processing(FlowState.PROCESS_IMAGE_SCHEDULED);
+        }
     }
 }
