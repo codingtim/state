@@ -63,8 +63,7 @@ public class ProcessFlowStates {
                 episodeImageEntity.imageAdded(imageAddedEvent.getRemoteImageId());
                 return new ExposeImageState();
             } else {
-                episodeImageEntity.processFailure(FlowState.PROCESS_IMAGE_FAILED);
-                return new FailedState();
+                return new FailedState(FlowState.PROCESS_IMAGE_FAILED);
             }
         }
     }
@@ -94,7 +93,7 @@ public class ProcessFlowStates {
                 return new CreateEditorialObjectState();
             } else {
                 episodeImageEntity.processFailure(FlowState.EXPOSE_IMAGE_FAILED);
-                return new FailedState();
+                return new FailedState(FlowState.EXPOSE_IMAGE_FAILED);
             }
         }
     }
@@ -127,14 +126,19 @@ public class ProcessFlowStates {
                 episodeImageEntity.editorialObjectCreated();
                 return new CompletedState();
             } else {
-                episodeImageEntity.processFailure(FlowState.PROCESS_EO_FAILED);
-                return new FailedState();
+                return new FailedState(FlowState.PROCESS_EO_FAILED);
             }
         }
 
     }
 
     private class FailedState implements ProcessFlowState {
+        private FlowState failedFlowState;
+
+        public FailedState(FlowState failedFlowState) {
+            this.failedFlowState = failedFlowState;
+        }
+
         @Override
         public ProcessFlowState startProcessing() {
             return null;
@@ -142,7 +146,7 @@ public class ProcessFlowStates {
 
         @Override
         public void stateEntered(EpisodeImageEntity episodeImageEntity) {
-
+            episodeImageEntity.processFailure(failedFlowState);
         }
 
         @Override
