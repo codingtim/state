@@ -16,13 +16,11 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
     private ProcessFlowStates processFlowStates;
     private EpisodeImageRepository repository;
     private EpisodeService episodeService;
-    private RemoteCatalogGateway remoteCatalogGateway;
 
-    public EpisodeImageServiceImpl(ProcessFlowStates processFlowStates, EpisodeImageRepository repository, EpisodeService episodeService, RemoteCatalogGateway remoteCatalogGateway) {
+    public EpisodeImageServiceImpl(ProcessFlowStates processFlowStates, EpisodeImageRepository repository, EpisodeService episodeService) {
         this.processFlowStates = processFlowStates;
         this.repository = repository;
         this.episodeService = episodeService;
-        this.remoteCatalogGateway = remoteCatalogGateway;
     }
 
     @Override
