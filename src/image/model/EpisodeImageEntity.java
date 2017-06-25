@@ -76,7 +76,7 @@ public class EpisodeImageEntity {
         this.flowStates = flowStates;
     }
 
-    void addFlowState(FlowState flowState){
+    private void addFlowState(FlowState flowState){
         ProcessFlowStateEntity flowStateEntity = new ProcessFlowStateEntity();
         flowStateEntity.setFlowState(flowState);
         flowStates.add(flowStateEntity);
@@ -92,8 +92,11 @@ public class EpisodeImageEntity {
 
     public void startProcessing() {
         currentState.startProcessing(this);
+    }
+
+    void processing(FlowState flowState) {
         state = State.PROCESSING;
-        addFlowState(FlowState.PROCESS_IMAGE_SCHEDULED);
+        addFlowState(flowState);
     }
 
     public void imageAdded(String remoteImageId) {

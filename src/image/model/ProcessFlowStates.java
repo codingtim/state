@@ -16,6 +16,7 @@ public class ProcessFlowStates {
             @Override
             public void startProcessing(EpisodeImageEntity episodeImageEntity) {
                 remoteImagesGateway.addImage(episodeImageEntity);
+                episodeImageEntity.processing(FlowState.PROCESS_IMAGE_SCHEDULED);
             }
         };
     }
