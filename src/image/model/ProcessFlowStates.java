@@ -89,8 +89,13 @@ public class ProcessFlowStates {
 
         @Override
         public ProcessFlowState imageExposedEvent(ImageExposedEvent imageExposedEvent, EpisodeImageEntity episodeImageEntity) {
-            episodeImageEntity.imageExposed();
-            return new CreateEditorialObjectState();
+            if(imageExposedEvent.wasSuccessful()) {
+                episodeImageEntity.imageExposed();
+                return new CreateEditorialObjectState();
+            } else {
+                episodeImageEntity.processFailure(FlowState.EXPOSE_IMAGE_FAILED);
+                return new FailedState();
+            }
         }
     }
 

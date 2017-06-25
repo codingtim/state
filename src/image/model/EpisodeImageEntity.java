@@ -125,11 +125,6 @@ public class EpisodeImageEntity {
         state = State.PROCESSED;
     }
 
-    public void imageExposureFailed() {
-        addFlowState(FlowState.EXPOSE_IMAGE_FAILED);
-        state = State.PROCESSING_FAILED;
-    }
-
     public void episodeImageProcessEventHappened(EpisodeImageProcessEvent event) {
         ProcessFlowState newState = currentState.eventHappened(this, event);
         if (newState != null) {

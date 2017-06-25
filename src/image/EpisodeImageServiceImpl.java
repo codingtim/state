@@ -66,7 +66,7 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
     @Override
     public void imageExposedFailed(String id) {
         repository.get(id).ifPresent(episodeImageEntity -> {
-            episodeImageEntity.imageExposureFailed();
+            episodeImageEntity.episodeImageProcessEventHappened(ImageExposedEvent.failure());
             repository.save(episodeImageEntity);
         });
     }
