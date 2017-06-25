@@ -3,6 +3,7 @@ package image;
 import episode.EpisodeEntity;
 import episode.EpisodeService;
 import image.model.EpisodeImageEntity;
+import image.event.ImageAddedEvent;
 import image.model.ProcessFlowStates;
 import scrape.ScrapedEpisodeEntity;
 
@@ -50,10 +51,9 @@ public class EpisodeImageServiceImpl implements EpisodeImageService {
     @Override
     public void imageAdded(String id, String remoteImageId) {
         repository.get(id).ifPresent(episodeImageEntity -> {
-            episodeImageEntity.imageAdded(remoteImageId);
-            repository.save(episodeImageEntity);
-            remoteImagesGateway.expose(episodeImageEntity);
-            episodeImageEntity.startExposing();
+            episodeImageEntity.episodeImageProcessEventHappened(
+                    ImageAddedEvent.success(remoteImageId)
+            );
             repository.save(episodeImageEntity);
         });
     }

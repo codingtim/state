@@ -1,5 +1,7 @@
 package image.model;
 
+import image.event.EpisodeImageProcessEvent;
+
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -104,13 +106,9 @@ public class EpisodeImageEntity {
         addFlowState(flowState);
     }
 
-    public void imageAdded(String remoteImageId) {
+    void imageAdded(String remoteImageId) {
         imageServiceId = remoteImageId;
         addFlowState(FlowState.PROCESS_IMAGE_FINISHED);
-    }
-
-    public void startExposing() {
-        addFlowState(FlowState.EXPOSE_IMAGE_SCHEDULED);
     }
 
     public void imageExposed() {
@@ -139,5 +137,13 @@ public class EpisodeImageEntity {
     public void imageExposureFailed() {
         addFlowState(FlowState.EXPOSE_IMAGE_FAILED);
         state = State.PROCESSING_FAILED;
+    }
+
+    public void episodeImageProcessEventHappened(EpisodeImageProcessEvent event) {
+        ProcessFlowState newState = currentState.eventHappened(this, event);
+        if (newState != null) {
+            currentState = newState;
+            newState.stateEntered(this);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package image;
 
 import episode.EpisodeEntity;
+import image.event.ImageAddedEvent;
 import image.model.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -72,7 +73,7 @@ class EpisodeImageServiceImplTest {
     void imageExposed() {
         EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url", processFlowStates);
         episodeImage.startProcessing();
-        episodeImage.imageAdded("remoteImage1");
+        episodeImage.episodeImageProcessEventHappened(ImageAddedEvent.success("remoteImage1"));
         repository.save(episodeImage);
 
         service.imageExposed(episodeImage.getId());
@@ -85,7 +86,7 @@ class EpisodeImageServiceImplTest {
     void imageExposureFailed() {
         EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url", processFlowStates);
         episodeImage.startProcessing();
-        episodeImage.imageAdded("remoteImage1");
+        episodeImage.episodeImageProcessEventHappened(ImageAddedEvent.success("remoteImage1"));
         repository.save(episodeImage);
 
         service.imageExposedFailed(episodeImage.getId());
@@ -98,7 +99,7 @@ class EpisodeImageServiceImplTest {
     void imageExposed_editorialObjectCreationFails() {
         EpisodeImageEntity episodeImage = new EpisodeImageEntity("eps1", "some.url", processFlowStates);
         episodeImage.startProcessing();
-        episodeImage.imageAdded("remoteImage1");
+        episodeImage.episodeImageProcessEventHappened(ImageAddedEvent.success("remoteImage1"));
         repository.save(episodeImage);
         remoteCatalogGateway.setCreationToUnsuccessful();
 
